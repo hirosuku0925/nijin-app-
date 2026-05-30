@@ -1,24 +1,20 @@
-name: Build iOS App
+name: Create and Build iOS App
 
 on: [push]
 
 jobs:
-  build:
+  create-and-build:
     runs-on: macos-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Build and Archive
+      - name: Create Project
         run: |
-          xcodebuild clean archive -scheme "YourApp" -destination "generic/platform=iOS" -archivePath build/App.xcarchive
-
-      - name: Export IPA
+          # コマンドでプロジェクトを生成する
+          mkdir MyNijinApp
+          cd MyNijinApp
+          # コマンドラインでプロジェクトを作成
+          xcodebuild -create-xcframework-dry-run  # これはあくまで例です
+          # 実際にはプロジェクトの雛形を生成する必要があります
+          
+      - name: Build
         run: |
-          xcodebuild -exportArchive -archivePath build/App.xcarchive -exportOptionsPlist ExportOptions.plist -exportPath .
-
-      - name: Upload IPA
-        uses: actions/upload-artifact@v4
-        with:
-          name: App-IPA
-          path: "*.ipa"
+          # ここにビルド処理を書く
