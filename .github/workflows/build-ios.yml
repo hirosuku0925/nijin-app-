@@ -1,30 +1,30 @@
-name: Build iOS IPA
+name: Build iOS App
 
-on:
-  push:
-    tags:
-      - 'v*'  # タグを打ったときに自動でビルド開始
+on: [push]
 
 jobs:
   build:
-    runs-on: macos-latest  # macOS環境を指定
+    runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      # 1. 必要なツールや証明書のインストール・復元
-      - name: Install Apple Certificate
-        env:
-          P12_BASE64: ${{ secrets.P12_BASE64 }}
-          # ...証明書を復元する処理...
-
-      # 2. ビルドの実行
       - name: Build and Archive
         run: |
-          xcodebuild archive -scheme YourAppScheme -archivePath build/YourApp.xcarchive
-          xcodebuild -exportArchive -archivePath build/YourApp.xcarchive -exportOptionsPlist exportOptions.plist -exportPath build/
+          xcodebuild clean archive \
+            -scheme "YourApp" \
+            -destination "generic/platform=iOS" \
+            -archivePath build/App.xcarchive
 
-      # 3. リリースへのアップロード（以前作成したリリースを活用）
-      - name: Upload to Release
-        uses: softprops/action-gh-release@v1
+      - name: Export IPA
+        run: |
+          xcodebuild -exportArchive \
+            -archivePath build/App.xcarchive \
+            -exportOptionsPlist ExportOptions.plist \
+            -exportPath .
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
         with:
-          files: build/YourApp.ipa
+          name: App-IPA
+          path: "*.ipa"
